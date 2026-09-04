@@ -3,12 +3,14 @@ import { siteConfig } from '../config/site';
 import ThemeToggle from './ThemeToggle.astro';
 
 const currentPath = Astro.url.pathname;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const getHref = (href: string) => href === '/' ? (base ? `${base}/` : '/') : `${base}${href}`;
 ---
 
 <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
     <!-- Logo / Nombre -->
-    <a href="/" class="group flex items-center gap-2.5 font-bold text-lg text-slate-900 dark:text-white transition-colors">
+    <a href={getHref('/')} class="group flex items-center gap-2.5 font-bold text-lg text-slate-900 dark:text-white transition-colors">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-blue-600 flex items-center justify-center text-white shadow-sm font-mono text-base font-extrabold group-hover:scale-105 transition-transform">
         &lt;/&gt;
       </div>
@@ -21,10 +23,11 @@ const currentPath = Astro.url.pathname;
     <!-- Navegación Desktop -->
     <nav class="hidden md:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-900/80 p-1.5 rounded-full border border-slate-200/60 dark:border-slate-800/60">
       {siteConfig.navLinks.map((link) => {
-        const isActive = currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href));
+        const fullLink = getHref(link.href);
+        const isActive = currentPath === fullLink || (link.href !== '/' && currentPath.includes(link.href));
         return (
           <a
-            href={link.href}
+            href={fullLink}
             class:list={[
               "px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
               isActive 
@@ -43,7 +46,7 @@ const currentPath = Astro.url.pathname;
       <ThemeToggle />
       
       <a 
-        href="/projects" 
+        href={getHref('/projects')} 
         class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition-all shadow-sm hover:shadow-teal-500/20"
       >
         <span>Ver Proyectos</span>
@@ -72,10 +75,11 @@ const currentPath = Astro.url.pathname;
   <!-- Menú Móvil Desplegable -->
   <div id="mobile-menu" class="hidden md:hidden border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-4 pt-2 pb-6 space-y-2">
     {siteConfig.navLinks.map((link) => {
-      const isActive = currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href));
+      const fullLink = getHref(link.href);
+      const isActive = currentPath === fullLink || (link.href !== '/' && currentPath.includes(link.href));
       return (
         <a
-          href={link.href}
+          href={fullLink}
           class:list={[
             "block px-4 py-2.5 rounded-xl text-base font-medium transition-colors",
             isActive 
@@ -89,13 +93,13 @@ const currentPath = Astro.url.pathname;
     })}
     <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex gap-2">
       <a 
-        href="/projects?category=academic" 
+        href={getHref('/projects?category=academic')} 
         class="flex-1 text-center py-2 text-xs font-semibold rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900"
       >
         🎓 Materias
       </a>
       <a 
-        href="/projects?category=personal" 
+        href={getHref('/projects?category=personal')} 
         class="flex-1 text-center py-2 text-xs font-semibold rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900"
       >
         🚀 Personales

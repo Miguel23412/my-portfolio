@@ -30,6 +30,8 @@ const academicTimeline = [
     description: "Programación Orientada a Objetos, Álgebra Lineal, Cálculo, Probabilidad Computacional y Fundamentos de Redes."
   }
 ];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const getHref = (href: string) => href === '/' ? (base ? `${base}/` : '/') : `${base}${href}`;
 ---
 
 <Layout 
@@ -77,7 +79,7 @@ const academicTimeline = [
             LinkedIn
           </a>
           <a
-            href="/contact"
+            href={getHref('/contact')}
             class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-colors"
           >
             Contactar por Email

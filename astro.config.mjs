@@ -8,5 +8,6 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
   ],
-  site: 'https://mi-portafolio.dev',
+  site: 'https://Miguel23412.github.io',
+  base: '/my-portfolio',
 });
