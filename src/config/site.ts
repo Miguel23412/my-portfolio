@@ -37,7 +37,7 @@ export const siteConfig: SiteConfig = {
   currentSemester: "5to Semestre", // Tu semestre actual
   location: "Cochabamba, Bolivia / Remoto", // Tu ubicación
   email: "miguelangelandradearnez@gmail.com", // Tu correo
-  github: "https://github.com", // Tu perfil de GitHub
+  github: "https://github.com/Miguel23412", // Tu perfil de GitHub
   linkedin: "https://linkedin.com", // Tu LinkedIn
   resumeUrl: "#", // Enlace a tu CV / Curriculum en PDF
 
@@ -49,9 +49,9 @@ export const siteConfig: SiteConfig = {
   ],
 
   socialLinks: [
-    { name: "GitHub", url: "https://github.com", icon: "github" },
+    { name: "GitHub", url: "https://github.com/Miguel23412", icon: "github" },
     { name: "LinkedIn", url: "https://linkedin.com", icon: "linkedin" },
-    { name: "Email", url: "mailto:tuemail@ejemplo.com", icon: "mail" },
+    { name: "Email", url: "mailto:miguelangelandradearnez@gmail.com", icon: "mail" },
   ],
 
   stats: {
