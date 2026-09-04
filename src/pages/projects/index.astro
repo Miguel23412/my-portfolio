@@ -1,0 +1,72 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import ProjectFilter from '../../components/ProjectFilter.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+
+// Ordenar por fecha descendente
+const sortedProjects = allProjects.sort(
+  (a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime()
+);
+
+const academicCount = sortedProjects.filter(p => p.data.category === 'academic').length;
+const personalCount = sortedProjects.filter(p => p.data.category === 'personal').length;
+
+// Extraer lista única de tecnologías para los filtros
+const allTags = Array.from(
+  new Set(sortedProjects.flatMap(p => p.data.tags))
+).slice(0, 10);
+---
+
+<Layout 
+  title="Galería de Proyectos | Materias & Proyectos Personales" 
+  description="Explora todos los proyectos desarrollados en asignaturas universitarias y proyectos personales de desarrollo de software."
+>
+  <div class="py-6">
+    <SectionTitle
+      badge="Galería Completa"
+      title="Todos mis Proyectos"
+      subtitle="Filtra fácilmente entre entregas de materias universitarias y proyectos personales construidos por cuenta propia."
+    />
+
+    <!-- Componente de Filtro Interactivo -->
+    <ProjectFilter
+      totalCount={sortedProjects.length}
+      academicCount={academicCount}
+      personalCount={personalCount}
+      availableTags={allTags}
+    />
+
+    <!-- Grid de Proyectos -->
+    <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {sortedProjects.map(project => (
+        <div
+          data-project-card
+          data-category={project.data.category}
+          data-tags={project.data.tags.join(',')}
+          data-title={project.data.title}
+          data-subject={project.data.subject || ''}
+          data-description={project.data.description}
+          class="flex"
+        >
+          <ProjectCard project={project} />
+        </div>
+      ))}
+    </div>
+
+    <!-- Mensaje cuando no hay resultados de búsqueda -->
+    <div id="no-projects-msg" class="hidden text-center py-16">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-2xl mb-4">
+        🔍
+      </div>
+      <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">No se encontraron proyectos</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+        Intenta con otro término de búsqueda o cambia la categoría de filtro seleccionada.
+      </p>
+    </div>
+
+  </div>
+</Layout>

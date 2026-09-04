@@ -1,0 +1,176 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TechBadge from '../../components/TechBadge.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+const { data } = project;
+const isAcademic = data.category === 'academic';
+---
+
+<Layout 
+  title={`${data.title} | Proyecto`}
+  description={data.description}
+>
+  <article class="max-w-4xl mx-auto py-6">
+    
+    <!-- Botón Volver -->
+    <div class="mb-8">
+      <a 
+        href="/projects" 
+        class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Volver a la galería de proyectos</span>
+      </a>
+    </div>
+
+    <!-- Encabezado del Proyecto -->
+    <header class="p-6 sm:p-8 rounded-3xl glass-card border border-slate-200/80 dark:border-slate-800/80 mb-10">
+      
+      <!-- Badges Superiores -->
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        {isAcademic ? (
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+            🎓 Materia: {data.subject}
+          </span>
+        ) : (
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+            🚀 Proyecto Personal
+          </span>
+        )}
+
+        {data.semester && (
+          <span class="px-2.5 py-1 rounded-md text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+            📅 {data.semester}
+          </span>
+        )}
+
+        {data.grade && (
+          <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            ⭐ {data.grade}
+          </span>
+        )}
+      </div>
+
+      <!-- Título Principal -->
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        {data.title}
+      </h1>
+
+      <!-- Descripción -->
+      <p class="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+        {data.description}
+      </p>
+
+      <!-- Ficha de Detalles Académicos / Técnicos -->
+      <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+        {data.professor && (
+          <div>
+            <span class="text-slate-400 block font-medium">Profesor / Docente:</span>
+            <span class="text-slate-800 dark:text-slate-200 font-semibold">{data.professor}</span>
+          </div>
+        )}
+        {data.team && (
+          <div>
+            <span class="text-slate-400 block font-medium">Modalidad de Trabajo:</span>
+            <span class="text-slate-800 dark:text-slate-200 font-semibold">{data.team}</span>
+          </div>
+        )}
+        <div>
+          <span class="text-slate-400 block font-medium">Fecha de Presentación:</span>
+          <span class="text-slate-800 dark:text-slate-200 font-semibold">{data.publishDate}</span>
+        </div>
+      </div>
+
+      <!-- Enlaces de Acción -->
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        {data.githubUrl && (
+          <a
+            href={data.githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-semibold flex items-center gap-2 transition-colors"
+          >
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            <span>Ver Repositorio en GitHub</span>
+          </a>
+        )}
+
+        {data.liveUrl && (
+          <a
+            href={data.liveUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            <span>Abrir Demo en Vivo</span>
+          </a>
+        )}
+      </div>
+
+      <!-- Tecnologías -->
+      <div class="mt-6 flex flex-wrap gap-1.5">
+        {data.tags.map(tag => (
+          <TechBadge name={tag} size="md" />
+        ))}
+      </div>
+
+    </header>
+
+    <!-- Puntos Destacados / Highlights -->
+    {data.highlights && data.highlights.length > 0 && (
+      <div class="p-6 rounded-2xl bg-teal-50/50 dark:bg-teal-950/30 border border-teal-200/80 dark:border-teal-900/60 mb-10">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300 flex items-center gap-2 mb-3">
+          <span>✨ Logros y Aspectos Técnicos Destacados</span>
+        </h3>
+        <ul class="space-y-2 text-sm text-slate-700 dark:text-slate-300">
+          {data.highlights.map(h => (
+            <li class="flex items-start gap-2">
+              <span class="text-teal-500 font-bold">&bull;</span>
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- Contenido Markdown Renderizado -->
+    <div class="prose prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-teal-600 dark:prose-a:text-teal-400 prose-pre:rounded-2xl prose-pre:border prose-pre:border-slate-800">
+      <Content />
+    </div>
+
+    <!-- Navegación Inferior -->
+    <div class="mt-14 pt-8 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
+      <a
+        href="/projects"
+        class="inline-flex items-center gap-2 text-sm font-semibold text-teal-600 dark:text-teal-400 hover:underline"
+      >
+        &larr; Ver todos los proyectos
+      </a>
+      <a
+        href="/contact"
+        class="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+      >
+        ¿Alguna pregunta sobre este proyecto? Contáctame &rarr;
+      </a>
+    </div>
+
+  </article>
+</Layout>

@@ -1,0 +1,219 @@
+---
+interface Props {
+  totalCount: number;
+  academicCount: number;
+  personalCount: number;
+  availableTags: string[];
+}
+
+const { totalCount, academicCount, personalCount, availableTags } = Astro.props;
+---
+
+<div class="mb-10 space-y-6">
+  <!-- Fila Superior: Tabs de Categoría y Buscador -->
+  <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+    
+    <!-- Pestañas de Filtrado -->
+    <div class="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900 border border-slate-300/60 dark:border-slate-800" role="tablist">
+      <button
+        type="button"
+        class="filter-btn active-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2"
+        data-filter="all"
+      >
+        <span>Todos</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-mono bg-slate-300 dark:bg-slate-800 text-slate-700 dark:text-slate-300 count-badge">
+          {totalCount}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+        data-filter="academic"
+      >
+        <span>🎓 Materias Universitarias</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-mono bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 count-badge">
+          {academicCount}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+        data-filter="personal"
+      >
+        <span>🚀 Proyectos Personales</span>
+        <span class="px-2 py-0.5 rounded-full text-xs font-mono bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 count-badge">
+          {personalCount}
+        </span>
+      </button>
+    </div>
+
+    <!-- Buscador en tiempo real -->
+    <div class="relative min-w-[260px]">
+      <input
+        type="text"
+        id="project-search"
+        placeholder="Buscar por materia, tech o nombre..."
+        class="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 border border-slate-300/80 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all shadow-xs"
+      />
+      <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- Fila Inferior: Chips de Tecnologías Populares -->
+  <div class="flex items-center gap-2 flex-wrap text-xs">
+    <span class="text-slate-500 dark:text-slate-400 font-medium">Filtrar por tecnología:</span>
+    <button 
+      type="button" 
+      class="tech-tag-filter active-tech px-2.5 py-1 rounded-lg border font-mono transition-colors bg-teal-600 text-white border-teal-600"
+      data-tech="all"
+    >
+      Todas
+    </button>
+    {availableTags.map(tag => (
+      <button 
+        type="button" 
+        class="tech-tag-filter px-2.5 py-1 rounded-lg border font-mono transition-colors bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400"
+        data-tech={tag.toLowerCase()}
+      >
+        #{tag}
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .active-tab {
+    @apply bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm;
+  }
+</style>
+
+<script>
+  function setupFilter() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const techButtons = document.querySelectorAll('.tech-tag-filter');
+    const searchInput = document.getElementById('project-search') as HTMLInputElement;
+    const projectCards = document.querySelectorAll('[data-project-card]') as NodeListOf<HTMLElement>;
+    const noResultsMsg = document.getElementById('no-projects-msg');
+
+    let currentCategory = 'all';
+    let currentTech = 'all';
+    let currentSearch = '';
+
+    // Leer parámetros de URL iniciales (ej. /projects?category=academic)
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCategory = urlParams.get('category');
+    if (initialCategory && ['all', 'academic', 'personal'].includes(initialCategory)) {
+      currentCategory = initialCategory;
+      updateCategoryUI(initialCategory);
+    }
+
+    function updateCategoryUI(cat: string) {
+      filterButtons.forEach(btn => {
+        const filterVal = btn.getAttribute('data-filter');
+        if (filterVal === cat) {
+          btn.classList.add('active-tab', 'bg-white', 'dark:bg-slate-800', 'text-slate-900', 'dark:text-white', 'shadow-sm');
+          btn.classList.remove('text-slate-600', 'dark:text-slate-400');
+        } else {
+          btn.classList.remove('active-tab', 'bg-white', 'dark:bg-slate-800', 'text-slate-900', 'dark:text-white', 'shadow-sm');
+          btn.classList.add('text-slate-600', 'dark:text-slate-400');
+        }
+      });
+    }
+
+    function updateTechUI(tech: string) {
+      techButtons.forEach(btn => {
+        const techVal = btn.getAttribute('data-tech');
+        if (techVal === tech) {
+          btn.classList.add('bg-teal-600', 'text-white', 'border-teal-600');
+          btn.classList.remove('bg-white', 'dark:bg-slate-900', 'text-slate-600', 'dark:text-slate-400');
+        } else {
+          btn.classList.remove('bg-teal-600', 'text-white', 'border-teal-600');
+          btn.classList.add('bg-white', 'dark:bg-slate-900', 'text-slate-600', 'dark:text-slate-400');
+        }
+      });
+    }
+
+    function applyFilters() {
+      let visibleCount = 0;
+
+      projectCards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category') || '';
+        const cardTags = (card.getAttribute('data-tags') || '').toLowerCase().split(',');
+        const cardTitle = (card.getAttribute('data-title') || '').toLowerCase();
+        const cardSubject = (card.getAttribute('data-subject') || '').toLowerCase();
+        const cardDesc = (card.getAttribute('data-description') || '').toLowerCase();
+
+        const matchesCategory = currentCategory === 'all' || cardCategory === currentCategory;
+        const matchesTech = currentTech === 'all' || cardTags.includes(currentTech);
+        
+        const searchLower = currentSearch.toLowerCase().trim();
+        const matchesSearch = !searchLower || 
+          cardTitle.includes(searchLower) || 
+          cardSubject.includes(searchLower) || 
+          cardDesc.includes(searchLower) || 
+          cardTags.some(t => t.includes(searchLower));
+
+        if (matchesCategory && matchesTech && matchesSearch) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (noResultsMsg) {
+        if (visibleCount === 0) {
+          noResultsMsg.classList.remove('hidden');
+        } else {
+          noResultsMsg.classList.add('hidden');
+        }
+      }
+    }
+
+    // Eventos
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.getAttribute('data-filter') || 'all';
+        currentCategory = filter;
+        updateCategoryUI(filter);
+        applyFilters();
+
+        // Actualizar URL sin recargar la página
+        const newUrl = new URL(window.location.href);
+        if (filter === 'all') {
+          newUrl.searchParams.delete('category');
+        } else {
+          newUrl.searchParams.set('category', filter);
+        }
+        window.history.replaceState({}, '', newUrl.toString());
+      });
+    });
+
+    techButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tech = btn.getAttribute('data-tech') || 'all';
+        currentTech = tech;
+        updateTechUI(tech);
+        applyFilters();
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = (e.target as HTMLInputElement).value;
+        applyFilters();
+      });
+    }
+
+    // Inicializar
+    applyFilters();
+  }
+
+  setupFilter();
+  document.addEventListener('astro:after-swap', setupFilter);
+</script>
